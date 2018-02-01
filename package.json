@@ -1,0 +1,38 @@
+{
+  "scripts": {
+    "build": "ebam",
+    "pretest": "npm run build",
+    "test": "node test/code.js"
+  },
+  "name": "bitwane-test",
+  "description": "The test formatting version of bitwane",
+  "keywords": [
+    "log",
+    "test",
+    "logger"
+  ],
+  "version": "1.0.0",
+  "license": "MIT",
+  "ebam": {
+    "entry": "src/index.js",
+    "transforms": {
+      "dangerousForOf": false,
+      "dangerousTaggedTemplateString": false
+    },
+    "test": {
+      "dest": "test/code.js",
+      "src": "test/src.js"
+    }
+  },
+  "author": "Quentin Engles <hollowdoor99@gmail.com> (https://hollowdoor.github.io)",
+  "main": "dist/bundle.js",
+  "jsnext:main": "dist/bundle.es.js",
+  "module": "dist/bundle.es.js",
+  "dependencies": {
+    "bitwane": "^1.1.1",
+    "diff": "^3.4.0",
+    "indent-string": "^3.2.0",
+    "serialize-javascript": "^1.4.0",
+    "uni-compat": "^1.0.2"
+  }
+}
