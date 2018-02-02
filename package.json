@@ -29,10 +29,10 @@
   "jsnext:main": "dist/bundle.es.js",
   "module": "dist/bundle.es.js",
   "dependencies": {
-    "bitwane": "^1.1.1",
+    "bitwane": "^1.2.0",
     "diff": "^3.4.0",
     "indent-string": "^3.2.0",
     "serialize-javascript": "^1.4.0",
-    "uni-compat": "^1.0.2"
+    "uni-compat": "^1.1.0"
   }
 }
