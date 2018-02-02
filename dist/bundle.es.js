@@ -1,9 +1,9 @@
 import { Logger, allowedColors, logSymbols } from 'bitwane';
 import serialize from 'serialize-javascript';
 import jsDiff from 'diff';
-import indentString from 'indent-string';
+import indent from 'indent-string';
 
-function indent(str, depth){
+function indent$1(str, depth){
     if ( depth === void 0 ) depth = '';
 
     var sep = '';
@@ -66,7 +66,7 @@ function inlineDiff(){
         if(typeof lhs === 'string'){
             dif = jsDiff.diffWords(lhs, rhs);
             return dent
-            ? indent(dif.map(colorize).join(''), dent).split('\n')
+            ? indent$1(dif.map(colorize).join(''), dent).split('\n')
             : dif.map(colorize).join('').split('\n');
         }else if(typeof lhs === 'object'){
             try{
@@ -84,7 +84,7 @@ function inlineDiff(){
         }
 
         return dent
-        ? dif.map(colorize).map(function (s){ return indent(s, dent); })
+        ? dif.map(colorize).map(function (s){ return indent$1(s, dent); })
         : dif.map(colorize);
     }
 }
@@ -95,7 +95,6 @@ var TestLogger = (function (Logger$$1) {
         var prefixes = ref.prefixes; if ( prefixes === void 0 ) prefixes = {};
         var each = ref.each; if ( each === void 0 ) each = null;
         var diff = ref.diff; if ( diff === void 0 ) diff = null;
-        var indent = ref.indent; if ( indent === void 0 ) indent = 0;
 
         Logger$$1.call(this, {each: each});
         this.prefixes = ['ok', 'notok']
@@ -104,7 +103,6 @@ var TestLogger = (function (Logger$$1) {
             return obj;
         }, {});
         this._diff = diff || inlineDiff();
-        this._indent = indent || indentString;
     }
 
     if ( Logger$$1 ) TestLogger.__proto__ = Logger$$1;
@@ -114,13 +112,13 @@ var TestLogger = (function (Logger$$1) {
         if ( format === void 0 ) format = {};
         if ( dent === void 0 ) dent = 0;
 
-        return Logger$$1.prototype.log.call(this, this._indent(input, dent), format);
+        return Logger$$1.prototype.log.call(this, indent(input, dent), format);
     };
     TestLogger.prototype.error = function error (input, format, dent){
         if ( format === void 0 ) format = {};
         if ( dent === void 0 ) dent = 0;
 
-        return Logger$$1.prototype.error.call(this, this._indent(input, dent), format);
+        return Logger$$1.prototype.error.call(this, indent(input, dent), format);
     };
     TestLogger.prototype.ok = function ok (input, format, dent){
         if ( format === void 0 ) format = {};
@@ -147,20 +145,6 @@ var TestLogger = (function (Logger$$1) {
 
     return TestLogger;
 }(Logger));
-
-/*const log = TestLogger.prototype.log;
-TestLogger.prototype._diffLog = IN_BROWSER
-? function(lines){
-    //let lines = diff(expected, actual, dent);
-    return log.call(this, lines.join('\n\n'));
-}
-:
-TestLogger.prototype._diffLog = function(lines){
-    lines.map(line=>{
-        log.call(this, line);
-        return line;
-    });
-};*/
 
 export { logSymbols as symbols, TestLogger };
 //# sourceMappingURL=bundle.es.js.map

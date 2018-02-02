@@ -1,9 +1,33 @@
 (function (exports) {
 'use strict';
 
+var browserSupportsLogStyles_1$1 = browserSupportsLogStyles;
+
+function browserSupportsLogStyles () {
+  // don’t run in non-browser environments
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return false
+  }
+
+  // edge browser? https://msdn.microsoft.com/en-us/library/hh869301%28v=vs.85%29.aspx
+  var isEdge = navigator.userAgent.toLowerCase().indexOf('edge') > -1;
+  // http://stackoverflow.com/a/16459606/376773
+  var isWebkit = 'WebkitAppearance' in document.documentElement.style;
+  // http://stackoverflow.com/a/398120/376773
+  var isFirebug = window.console && (window.console.firebug || (window.console.exception && window.console.table)) && true;
+  // firefox >= v31? https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+  var isFirefoxWithLogStyleSupport = navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31;
+
+  return (isWebkit && !isEdge) || isFirebug || isFirefoxWithLogStyleSupport || false
+}
+
 //Except for IN_BROWSER constants should be side effect free for transpiler tree shaking
 var IN_BROWSER = new Function("try {return this===window;}catch(e){ return false;}")();
 var SUPPORTS_UTF8 = IN_BROWSER || (process.platform !== 'win32' || process.env.CI || process.env.TERM === 'xterm-256color');
+
+function supportsLogStyles(){
+    return IN_BROWSER && browserSupportsLogStyles_1$1();
+}
 
 function supportsColor(){
     if(IN_BROWSER){
@@ -144,6 +168,8 @@ var TERM_SUPPORTS_COLOR$$1 = (function (){
     return !supports.browser && supports.stdout.hasBasic;
 })();
 
+var SUPPORTS_LOG_STYLES = supportsLogStyles();
+
 var DEBUG = debugging();
 
 var logSymbols = SUPPORTS_UTF8 ?
@@ -231,6 +257,10 @@ var processInput = IN_BROWSER
     .replace(pattern, function (m, type, res, str){
         if(type === '%('){
             return format[res] + str;
+        }
+
+        if(!SUPPORTS_LOG_STYLES){
+            return '';
         }
 
         if(!res.length){
@@ -2375,7 +2405,6 @@ var TestLogger = (function (Logger$$1) {
         var prefixes = ref.prefixes; if ( prefixes === void 0 ) prefixes = {};
         var each = ref.each; if ( each === void 0 ) each = null;
         var diff = ref.diff; if ( diff === void 0 ) diff = null;
-        var indent = ref.indent; if ( indent === void 0 ) indent = 0;
 
         Logger$$1.call(this, {each: each});
         this.prefixes = ['ok', 'notok']
@@ -2384,7 +2413,6 @@ var TestLogger = (function (Logger$$1) {
             return obj;
         }, {});
         this._diff = diff || inlineDiff();
-        this._indent = indent || indentString;
     }
 
     if ( Logger$$1 ) TestLogger.__proto__ = Logger$$1;
@@ -2394,13 +2422,13 @@ var TestLogger = (function (Logger$$1) {
         if ( format === void 0 ) format = {};
         if ( dent === void 0 ) dent = 0;
 
-        return Logger$$1.prototype.log.call(this, this._indent(input, dent), format);
+        return Logger$$1.prototype.log.call(this, indentString(input, dent), format);
     };
     TestLogger.prototype.error = function error (input, format, dent){
         if ( format === void 0 ) format = {};
         if ( dent === void 0 ) dent = 0;
 
-        return Logger$$1.prototype.error.call(this, this._indent(input, dent), format);
+        return Logger$$1.prototype.error.call(this, indentString(input, dent), format);
     };
     TestLogger.prototype.ok = function ok (input, format, dent){
         if ( format === void 0 ) format = {};
@@ -2427,20 +2455,6 @@ var TestLogger = (function (Logger$$1) {
 
     return TestLogger;
 }(Logger));
-
-/*const log = TestLogger.prototype.log;
-TestLogger.prototype._diffLog = IN_BROWSER
-? function(lines){
-    //let lines = diff(expected, actual, dent);
-    return log.call(this, lines.join('\n\n'));
-}
-:
-TestLogger.prototype._diffLog = function(lines){
-    lines.map(line=>{
-        log.call(this, line);
-        return line;
-    });
-};*/
 
 exports.symbols = logSymbols;
 exports.TestLogger = TestLogger;
