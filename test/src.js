@@ -1,4 +1,4 @@
-import { TestLogger, symbols } from '../';
+import { TestLogger, symbols,  } from '../';
 const logger = new TestLogger({
     prefixes: {
         ok: symbols.success + ' ',

@@ -1,9 +1,8 @@
 import { Logger, allowedColors, logSymbols } from 'bitwane';
 import serialize from 'serialize-javascript';
 import jsDiff from 'diff';
-import indent from 'indent-string';
 
-function indent$1(str, depth){
+function indent(str, depth){
     if ( depth === void 0 ) depth = '';
 
     var sep = '';
@@ -66,13 +65,11 @@ function inlineDiff(){
         if(typeof lhs === 'string'){
             dif = jsDiff.diffWords(lhs, rhs);
             return dent
-            ? indent$1(dif.map(colorize).join(''), dent).split('\n')
+            ? indent(dif.map(colorize).join(''), dent).split('\n')
             : dif.map(colorize).join('').split('\n');
         }else if(typeof lhs === 'object'){
             try{
-                dif = jsDiff.diffJson(lhs, rhs, {
-                    //newlineIsToken: true
-                });
+                dif = jsDiff.diffJson(lhs, rhs);
             }catch(e){
                 dif = jsDiff.diffLines(
                     serialize(lhs),
@@ -84,7 +81,7 @@ function inlineDiff(){
         }
 
         return dent
-        ? dif.map(colorize).map(function (s){ return indent$1(s, dent); })
+        ? dif.map(colorize).map(function (s){ return indent(s, dent); })
         : dif.map(colorize);
     }
 }
@@ -93,33 +90,22 @@ var TestLogger = (function (Logger$$1) {
     function TestLogger(ref){
         if ( ref === void 0 ) ref = {};
         var prefixes = ref.prefixes; if ( prefixes === void 0 ) prefixes = {};
-        var each = ref.each; if ( each === void 0 ) each = null;
-        var diff = ref.diff; if ( diff === void 0 ) diff = null;
+        var diff = ref.diff; if ( diff === void 0 ) diff = inlineDiff();
+        var each = ref.each; if ( each === void 0 ) each = undefined;
+        var every = ref.every; if ( every === void 0 ) every = undefined;
 
-        Logger$$1.call(this, {each: each});
+        Logger$$1.call(this, {each: each, every: every});
         this.prefixes = ['ok', 'notok']
         .reduce(function (obj, key){
             obj[key] = prefixes[key] || '';
             return obj;
         }, {});
-        this._diff = diff || inlineDiff();
+        this._diff = diff;
     }
 
     if ( Logger$$1 ) TestLogger.__proto__ = Logger$$1;
     TestLogger.prototype = Object.create( Logger$$1 && Logger$$1.prototype );
     TestLogger.prototype.constructor = TestLogger;
-    TestLogger.prototype.log = function log (input, format, dent){
-        if ( format === void 0 ) format = {};
-        if ( dent === void 0 ) dent = 0;
-
-        return Logger$$1.prototype.log.call(this, indent(input, dent), format);
-    };
-    TestLogger.prototype.error = function error (input, format, dent){
-        if ( format === void 0 ) format = {};
-        if ( dent === void 0 ) dent = 0;
-
-        return Logger$$1.prototype.error.call(this, indent(input, dent), format);
-    };
     TestLogger.prototype.ok = function ok (input, format, dent){
         if ( format === void 0 ) format = {};
         if ( dent === void 0 ) dent = 0;

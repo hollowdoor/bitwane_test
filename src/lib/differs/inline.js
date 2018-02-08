@@ -44,9 +44,7 @@ export function inlineDiff(){
             : dif.map(colorize).join('').split('\n');
         }else if(typeof lhs === 'object'){
             try{
-                dif = jsDiff.diffJson(lhs, rhs, {
-                    //newlineIsToken: true
-                });
+                dif = jsDiff.diffJson(lhs, rhs);
             }catch(e){
                 dif = jsDiff.diffLines(
                     serialize(lhs),
