@@ -7,6 +7,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var bitwane = require('bitwane');
 var serialize = _interopDefault(require('serialize-javascript'));
 var jsDiff = _interopDefault(require('diff'));
+var uniCompat = require('uni-compat');
 
 function indent(str, depth){
     if ( depth === void 0 ) depth = '';
@@ -147,6 +148,20 @@ var TestLogger = (function (Logger$$1) {
 
     return TestLogger;
 }(bitwane.Logger));
+
+TestLogger.prototype.notok = uniCompat.IN_BROWSER
+? function(input, format, dent){
+    if ( format === void 0 ) format = {};
+    if ( dent === void 0 ) dent = 0;
+
+    return this.log(this._maps.notok(input), format, dent);
+}
+: function(input, format, dent){
+    if ( format === void 0 ) format = {};
+    if ( dent === void 0 ) dent = 0;
+
+    return this.error(this._maps.notok(input), format, dent);
+};
 
 exports.symbols = bitwane.logSymbols;
 exports.TestLogger = TestLogger;

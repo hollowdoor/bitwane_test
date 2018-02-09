@@ -2678,6 +2678,20 @@ var TestLogger = (function (Logger$$1) {
     return TestLogger;
 }(Logger));
 
+TestLogger.prototype.notok = IN_BROWSER
+? function(input, format, dent){
+    if ( format === void 0 ) format = {};
+    if ( dent === void 0 ) dent = 0;
+
+    return this.log(this._maps.notok(input), format, dent);
+}
+: function(input, format, dent){
+    if ( format === void 0 ) format = {};
+    if ( dent === void 0 ) dent = 0;
+
+    return this.error(this._maps.notok(input), format, dent);
+};
+
 exports.symbols = logSymbols;
 exports.TestLogger = TestLogger;
 

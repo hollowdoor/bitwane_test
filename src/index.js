@@ -1,5 +1,6 @@
 import { Logger, logSymbols } from 'bitwane';
 import { inlineDiff } from './lib/differs.js';
+import { IN_BROWSER } from 'uni-compat';
 
 export { logSymbols as symbols };
 
@@ -31,9 +32,6 @@ export class TestLogger extends Logger {
     ok(input, format = {}, dent = 0){
         return this.log(this._maps.ok(input), format, dent);
     }
-    notok(input, format = {}, dent = 0){
-        return this.error(this._maps.notok(input), format, dent);
-    }
     diff(expected, actual, dent){
         let lines = this._maps.diff(expected, actual, dent);
 
@@ -43,3 +41,11 @@ export class TestLogger extends Logger {
         });
     }
 }
+
+TestLogger.prototype.notok = IN_BROWSER
+? function(input, format = {}, dent = 0){
+    return this.log(this._maps.notok(input), format, dent);
+}
+: function(input, format = {}, dent = 0){
+    return this.error(this._maps.notok(input), format, dent);
+};
