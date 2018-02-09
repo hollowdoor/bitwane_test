@@ -2658,12 +2658,6 @@ var TestLogger = (function (Logger$$1) {
 
         return this.log(this._maps.ok(input), format, dent);
     };
-    TestLogger.prototype.notok = function notok (input, format, dent){
-        if ( format === void 0 ) format = {};
-        if ( dent === void 0 ) dent = 0;
-
-        return this.error(this._maps.notok(input), format, dent);
-    };
     TestLogger.prototype.diff = function diff (expected, actual, dent){
         var this$1 = this;
 
