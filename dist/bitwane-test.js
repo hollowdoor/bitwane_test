@@ -201,7 +201,7 @@ function rawObject(){
     return raw;
 }
 
-var TERM_SUPPORTS_COLOR$$1 = (function (){
+var TERM_SUPPORTS_COLOR = (function (){
     var supports = supportsColor();
     return !supports.browser && supports.stdout.hasBasic;
 })();
@@ -251,7 +251,7 @@ var fgcodes = rawObject({reset: reset});
 var bgcodes = rawObject({reset: reset});
 var styleCodes = rawObject({reset: reset});
 
-if(!IN_BROWSER && TERM_SUPPORTS_COLOR$$1){
+if(!IN_BROWSER && TERM_SUPPORTS_COLOR){
     //Set terminal colors
     Object.keys(allowedColors).forEach(function (color){
         fgcodes[color] = "\u001b[3" + (allowedColors[color]) + "m";
@@ -261,7 +261,7 @@ if(!IN_BROWSER && TERM_SUPPORTS_COLOR$$1){
     Object.keys(allowedStyles).forEach(function (style){
         styleCodes[style] = "\u001b[" + (allowedStyles[style]) + "m";
     });
-}else if(!TERM_SUPPORTS_COLOR$$1){
+}else if(!TERM_SUPPORTS_COLOR){
     Object.keys(allowedColors).forEach(function (color){
         fgcodes[color] = "";
         bgcodes[color] = "";
@@ -536,15 +536,18 @@ function printObject(input, depth, ending, start, hash){
     log(edge('}'), depth, ending);
 }
 
+function addTo(proto){
+    proto.clear = IN_BROWSER
+    //https://developer.mozilla.org/en-US/docs/Web/API/Console/clear
+    ? function (){ return console.clear(); }
+    //https://gist.github.com/KenanSulayman/4990953
+    : function (){ return process.stdout.write('\x1Bc'); };
+}
+
 //https://coderwall.com/p/yphywg/printing-colorful-text-in-terminal-when-run-node-js-script
 
 //const example = `$(red:blue underscore)string$()`;
 
-var clear = IN_BROWSER
-//https://developer.mozilla.org/en-US/docs/Web/API/Console/clear
-? function (){ return console.clear(); }
-//https://gist.github.com/KenanSulayman/4990953
-: function (){ return process.stdout.write('\x1Bc'); };
 
 var prefixer = function (doPrefix){
     return doPrefix && !IN_BROWSER
@@ -562,7 +565,6 @@ var Logger = function Logger(ref){
     }; }
 
     this.prefix = prefix;
-    this.clear = clear;
     this._prefix = prefixer(prefix);
     this._each = each;
     if(each && typeof each !== 'function'){
@@ -682,15 +684,7 @@ Logger.prototype.tree = function tree (input, indent){
     return printObject(input, indent, false, true);
 };
 
-
-Logger.prototype.notok = IN_BROWSER
-? function(input, format){
-    return this.error(input, format);
-}
-: function(input, format){
-    var inputs = processInput(((logSymbols.error) + " " + input), format);
-    return console.error.apply(console, inputs);
-};
+addTo(Logger.prototype);
 
 function indent(str, depth){
     if ( depth === void 0 ) depth = '';
