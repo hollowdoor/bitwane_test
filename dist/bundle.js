@@ -92,18 +92,28 @@ function inlineDiff(){
     }
 }
 
+var defaultMaps = {
+    ok: function ok(value){
+        return bitwane.logSymbols.success + ' ' + value;
+    },
+    notok: function notok(value){
+        return bitwane.logSymbols.error + ' ' + value;
+    },
+    diff: inlineDiff()
+};
+
 var TestLogger = (function (Logger$$1) {
     function TestLogger(ref){
         if ( ref === void 0 ) ref = {};
-        var prefixes = ref.prefixes; if ( prefixes === void 0 ) prefixes = {};
+        var maps = ref.maps; if ( maps === void 0 ) maps = {};
         var diff = ref.diff; if ( diff === void 0 ) diff = inlineDiff();
         var each = ref.each; if ( each === void 0 ) each = undefined;
         var every = ref.every; if ( every === void 0 ) every = undefined;
 
         Logger$$1.call(this, {each: each, every: every});
-        this.prefixes = ['ok', 'notok']
+        this._maps = ['ok', 'notok', 'diff']
         .reduce(function (obj, key){
-            obj[key] = prefixes[key] || '';
+            obj[key] = maps[key] || defaultMaps[key];
             return obj;
         }, {});
         this._diff = diff;
@@ -116,18 +126,18 @@ var TestLogger = (function (Logger$$1) {
         if ( format === void 0 ) format = {};
         if ( dent === void 0 ) dent = 0;
 
-        return this.log(this.prefixes.ok + input, format, dent);
+        return this.log(this._maps.ok(input), format, dent);
     };
     TestLogger.prototype.notok = function notok (input, format, dent){
         if ( format === void 0 ) format = {};
         if ( dent === void 0 ) dent = 0;
 
-        return this.error(this.prefixes.notok + input, format, dent);
+        return this.error(this._maps.notok(input), format, dent);
     };
     TestLogger.prototype.diff = function diff (expected, actual, dent){
         var this$1 = this;
 
-        var lines = this._diff(expected, actual, dent);
+        var lines = this._maps.diff(expected, actual, dent);
 
         lines.map(function (line){
             Logger$$1.prototype.log.call(this$1, line);

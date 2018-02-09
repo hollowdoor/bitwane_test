@@ -1,10 +1,5 @@
-import { TestLogger, symbols,  } from '../';
-const logger = new TestLogger({
-    prefixes: {
-        ok: symbols.success + ' ',
-        notok: symbols.error + ' '
-    }
-});
+import { TestLogger } from '../';
+const logger = new TestLogger();
 
 logger.diff({
     one: 1,
@@ -28,3 +23,4 @@ logger.diff(`I am a thing one`, `I am thing two`, 4)
 
 logger.ok('This is ok', null, 8);
 logger.notok('This is not ok');
+logger.ok('The $(red)%(what)$() is red.', {what: 'moon'});
