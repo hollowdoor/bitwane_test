@@ -19,9 +19,10 @@ export class TestLogger extends Logger {
         maps = {},
         diff = inlineDiff(),
         each = undefined,
-        every = undefined
+        every = undefined,
+        indentLength = 2
     } = {}){
-        super({each, every});
+        super({each, every, indentLength});
         this._maps = ['ok', 'notok', 'diff']
         .reduce((obj, key)=>{
             obj[key] = maps[key] || defaultMaps[key];
@@ -33,7 +34,7 @@ export class TestLogger extends Logger {
         return this.log(this._maps.ok(input), format, dent);
     }
     diff(expected, actual, dent){
-        let lines = this._maps.diff(expected, actual, dent);
+        let lines = this._maps.diff(expected, actual, dent * this.indentLength);
 
         lines.map(line=>{
             super.log(line);

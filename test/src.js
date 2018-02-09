@@ -21,6 +21,6 @@ logger.diff({
 logger.diff(`I am thing one`, `I am thing two`)
 logger.diff(`I am a thing one`, `I am thing two`, 4)
 
-logger.ok('This is ok', null, 8);
+logger.ok('This is ok', null, 2);
 logger.notok('This is not ok');
 logger.ok('The $(red)%(what)$() is red.', {what: 'moon'});

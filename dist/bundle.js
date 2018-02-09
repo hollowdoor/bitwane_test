@@ -110,8 +110,9 @@ var TestLogger = (function (Logger$$1) {
         var diff = ref.diff; if ( diff === void 0 ) diff = inlineDiff();
         var each = ref.each; if ( each === void 0 ) each = undefined;
         var every = ref.every; if ( every === void 0 ) every = undefined;
+        var indentLength = ref.indentLength; if ( indentLength === void 0 ) indentLength = 2;
 
-        Logger$$1.call(this, {each: each, every: every});
+        Logger$$1.call(this, {each: each, every: every, indentLength: indentLength});
         this._maps = ['ok', 'notok', 'diff']
         .reduce(function (obj, key){
             obj[key] = maps[key] || defaultMaps[key];
@@ -132,7 +133,7 @@ var TestLogger = (function (Logger$$1) {
     TestLogger.prototype.diff = function diff (expected, actual, dent){
         var this$1 = this;
 
-        var lines = this._maps.diff(expected, actual, dent);
+        var lines = this._maps.diff(expected, actual, dent * this.indentLength);
 
         lines.map(function (line){
             Logger$$1.prototype.log.call(this$1, line);
