@@ -33,11 +33,14 @@ export class TestLogger extends Logger {
     ok(input, format = {}, dent = 0){
         return this.log(this._maps.ok(input), format, dent);
     }
-    diff(expected, actual, dent){
+    diff(expected, actual, dent = 0, {
+        type = 'log'
+    } = {}){
+
         let lines = this._maps.diff(expected, actual, dent * this.indentLength);
 
         lines.map(line=>{
-            super.log(line);
+            super[type](line);
             return line;
         });
     }

@@ -124,13 +124,17 @@ var TestLogger = (function (Logger$$1) {
 
         return this.log(this._maps.ok(input), format, dent);
     };
-    TestLogger.prototype.diff = function diff (expected, actual, dent){
+    TestLogger.prototype.diff = function diff (expected, actual, dent, ref){
         var this$1 = this;
+        if ( dent === void 0 ) dent = 0;
+        if ( ref === void 0 ) ref = {};
+        var type = ref.type; if ( type === void 0 ) type = 'log';
+
 
         var lines = this._maps.diff(expected, actual, dent * this.indentLength);
 
         lines.map(function (line){
-            Logger$$1.prototype.log.call(this$1, line);
+            Logger$$1.prototype[type].call(this$1, line);
             return line;
         });
     };
